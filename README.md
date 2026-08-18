@@ -1,28 +1,19 @@
 # OpenShift ハンズオン：Ollama + Open WebUI
 
-講師デモ用。OpenShift 4.22.32、NVIDIA L4 x 1、Windows Server 2019 + WSL を前提とします。
+OpenShift 4.22.32、NVIDIA L4 x 1、Windows Server 2019 + WSL を前提にした講師デモ用教材です。
 
-## 実行
+## 詳細教材
 
-```bash
-oc new-project ollama-handson --display-name="OllamaHansOn" --description="OpenShift hands-on: Ollama + Open WebUI"
-oc apply -f manifests/01-pvc.yaml
-oc apply -f manifests/02-ollama.yaml
-oc rollout status deployment/ollama
-oc exec -it deploy/ollama -- ollama pull gemma4:e2b
-oc create secret generic open-webui-secret --from-literal=WEBUI_SECRET_KEY="$(openssl rand -base64 32)"
-oc apply -f manifests/03-open-webui.yaml
-oc rollout status deployment/open-webui
-oc create route edge --service=open-webui --port=http
-```
+- [事前準備](docs/00-prerequisites.md)
+- [Docker から OpenShift](docs/01-docker-to-openshift.md)
+- [LVM PVC と WaitForFirstConsumer](docs/02-pvc-lvm-waitforconsumer.md)
+- [Ollama GPU デプロイ](docs/03-deploy-ollama.md)
+- [モデルと API](docs/04-model-and-api.md)
+- [Open WebUI](docs/05-deploy-open-webui.md)
+- [Route と E2E](docs/06-route-e2e.md)
+- [可観測性](docs/07-observability.md)
+- [自己修復](docs/08-self-healing.md)
+- [WSL 付録](docs/appendix-wsl.md)
+- [クリーンアップ](docs/appendix-cleanup.md)
 
-LVM StorageClass の WaitForFirstConsumer により、PVC 作成直後の Pending は正常です。Ollama Pod 作成後に `ollama-data`、Open WebUI Pod 作成後に `webui-data` が Bound になります。
-
-`latest` / `main` は講師デモ用です。反復実施・運用では固定タグまたは image digest を使用してください。
-
-## クリーンアップ
-
-```bash
-oc delete project ollama-handson
-oc get project ollama-handson -w
-```
+Secret、Token、クラスタ URL は Git に保存しません。
