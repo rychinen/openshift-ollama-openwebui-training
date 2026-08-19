@@ -1,0 +1,31 @@
+# docker/compose.yaml
+# 第1章：WSL 上の CPU 実行 Docker Compose 比較環境（GPU は使用しない）
+#
+# ポート方針:
+#   ホスト 11435 -> コンテナ 11434
+#   OpenShift 側の `oc port-forward svc/ollama 11434:11434` と競合させないため、
+#   Docker 側のホストポートは 11435 を使用する。
+#   Compose 内部の接続先 http://ollama:11434 は変更しない。
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11435:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "3000:8080"
+    environment:
+      # Compose Service 名で名前解決される（localhost ではない）
+      OLLAMA_BASE_URL: http://ollama:11434
+    volumes:
+      - webui-data:/app/backend/data
+    depends_on:
+      - ollama
+
+volumes:
+  ollama-data:
+  webui-data:
