@@ -1,0 +1,65 @@
+# manifests/03-open-webui.yaml
+# Open WebUI をデプロイし、クラスタ内部の Service/ollama へ接続させる。
+#
+# 事前に Secret を作成しておくこと（値は YAML / Git に書かない）:
+#   oc create secret generic open-webui-secret \
+#     --from-literal=WEBUI_SECRET_KEY="$(openssl rand -base64 32)"
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: open-webui
+  labels:
+    app: open-webui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: open-webui
+  template:
+    metadata:
+      labels:
+        app: open-webui
+    spec:
+      containers:
+        - name: open-webui
+          # 講師デモ用。反復実施・運用では固定 tag または digest を使用する。
+          image: ghcr.io/open-webui/open-webui:main
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            # Pod 内の localhost は Open WebUI 自身を指すため、Service 名を使う
+            - name: OLLAMA_BASE_URL
+              value: http://ollama:11434
+            - name: WEBUI_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: open-webui-secret
+                  key: WEBUI_SECRET_KEY
+          volumeMounts:
+            - name: webui-data
+              mountPath: /app/backend/data
+          resources:
+            requests:
+              cpu: 250m
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+      volumes:
+        - name: webui-data
+          persistentVolumeClaim:
+            claimName: webui-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: open-webui
+spec:
+  selector:
+    app: open-webui
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080
+      targetPort: http
