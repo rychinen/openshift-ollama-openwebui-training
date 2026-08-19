@@ -1,0 +1,29 @@
+# manifests/04-route.yaml
+# 参考：Open WebUI を edge TLS termination で外部公開する Route。
+#
+# 教材本文では以下の CLI で作成する（Host 名は自動生成される）:
+#   oc create route edge --service=open-webui --port=http
+#
+# 本ラボの作業端末は内部 DNS を利用できないため、Windows の hosts ファイルに
+# Route Host 名と Ingress Router の IP アドレスを登録する:
+#   C:\Windows\System32\drivers\etc\hosts
+#   <INGRESS_ROUTER_IP>  <ROUTE_HOST>
+#
+# hosts を事前に配布したい場合は、spec.host を固定してこの YAML を適用する。
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: open-webui
+  labels:
+    app: open-webui
+spec:
+  # Host を固定する場合のみ指定する。省略すると自動生成される。
+  # host: open-webui-ollama-handson.apps.<CLUSTER_DOMAIN>
+  to:
+    kind: Service
+    name: open-webui
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
