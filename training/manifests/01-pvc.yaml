@@ -1,0 +1,25 @@
+# manifests/01-pvc.yaml
+# Ollama のモデル保存用と Open WebUI の状態データ保存用 PVC
+# storageClassName は指定しない（クラスタ default の LVM StorageClass を使用）
+# LVM StorageClass は WaitForFirstConsumer のため、作成直後は Pending が正常
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ollama-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: webui-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
