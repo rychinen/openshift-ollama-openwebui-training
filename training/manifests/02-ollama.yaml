@@ -1,0 +1,56 @@
+# manifests/02-ollama.yaml
+# Ollama を GPU（NVIDIA L4 × 1）付き Deployment としてデプロイし、
+# クラスタ内部からのみアクセスする Service を作成する。
+# Ollama には Route を作成しない（外部公開は Open WebUI のみ）。
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+  labels:
+    app: ollama
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      containers:
+        - name: ollama
+          # 講師デモ用。反復実施・運用では固定 tag または digest を使用する。
+          image: ollama/ollama:latest
+          ports:
+            - name: http
+              containerPort: 11434
+          volumeMounts:
+            - name: ollama-data
+              mountPath: /root/.ollama
+          resources:
+            requests:
+              cpu: "1"
+              memory: 8Gi
+              nvidia.com/gpu: "1"
+            limits:
+              cpu: "2"
+              memory: 12Gi
+              nvidia.com/gpu: "1"
+      volumes:
+        - name: ollama-data
+          persistentVolumeClaim:
+            claimName: ollama-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama
+spec:
+  selector:
+    app: ollama
+  ports:
+    - name: http
+      protocol: TCP
+      port: 11434
+      targetPort: http
