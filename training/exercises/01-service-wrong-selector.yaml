@@ -1,0 +1,26 @@
+# exercises/01-service-wrong-selector.yaml
+# 障害演習：Service selector を Pod label と一致しない値へ変更する。
+#
+# 期待される結果:
+#   - Ollama Pod は Running / Ready 1/1 のまま
+#   - Service/ollama は存在するが Endpoints が空になる
+#   - Open WebUI から http://ollama:11434 へ接続できなくなる
+#
+# 適用:
+#   oc apply -f exercises/01-service-wrong-selector.yaml
+#   oc get endpoints ollama
+#
+# 復旧:
+#   oc apply -f manifests/02-ollama.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama
+spec:
+  selector:
+    app: ollama-incorrect
+  ports:
+    - name: http
+      protocol: TCP
+      port: 11434
+      targetPort: http
