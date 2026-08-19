@@ -122,7 +122,7 @@ training/openshift-ollama-openwebui/
   ├─ README.md
   └─ full-training-final.md    ← 本ドキュメント（正本）
 
-manifests/
+training/manifests/
   ├─ 01-pvc.yaml
   ├─ 02-ollama.yaml
   └─ 03-open-webui.yaml
@@ -130,7 +130,7 @@ manifests/
 exercises/
   └─ 01-service-wrong-selector.yaml
 
-docker/
+training/docker/
   └─ compose.yaml
 ```
 
