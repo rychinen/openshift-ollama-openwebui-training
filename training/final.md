@@ -1,6 +1,6 @@
 # OpenShift ハンズオン：Docker Compose から Ollama + Open WebUI を OpenShift へ
 
-> **対象**：Docker / Docker Compose は理解しているが、OpenShift は初めての受講者  
+> **対象**：Docker / Docker Compose は理解していて、OpenShift は初めての受講者  
 > **形式**：講師デモ中心。受講者は WSL から追操作  
 > **想定時間**：標準 4〜5 時間  
 > **クライアント端末**：Windows Server 2019 + WSL（Linux 版 `oc` 導入済み）  
